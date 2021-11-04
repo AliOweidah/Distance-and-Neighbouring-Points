@@ -1,0 +1,153 @@
+#include <iostream>
+#include <cmath>
+#include <string>
+#include <iomanip>
+
+
+using namespace std;
+
+struct obstacle //main struct of the obstacles , Task 1
+{
+    string name;
+    double x,y,distance;
+    obstacle *next;
+};
+
+double calculating_distance(obstacle *O1,obstacle *O2) // function to calculate the Euclidian distance  , Task 2
+{
+    double d;
+    d = sqrt(pow(O1->x - O2->x,2)+pow(O1->y - O2->y,2));
+    return d;
+}
+
+obstacle* nearest(obstacle*head, obstacle* loopindex) //function to calculate the nearest other obstacle ,Task 3
+{
+
+
+    obstacle *curr= new obstacle;
+    obstacle *nearest= new obstacle;
+    curr=head;
+
+
+    double Loop_resson;
+    double minimum=1000;
+
+    do
+    {
+
+        Loop_resson=calculating_distance(curr,loopindex);
+        if(Loop_resson!=0)
+        {
+             if(Loop_resson<minimum)
+             {
+
+             minimum=Loop_resson;
+             nearest=curr;
+             }
+        }
+        curr=curr->next;
+
+    }
+    while(curr!=NULL);
+    return nearest;
+
+
+}
+
+
+obstacle* sorting(obstacle*&head, obstacle* sorted_obstacle)//function to sort the list's elements , Task 4
+{
+
+    obstacle *current=new obstacle;
+
+    if(head==NULL || sorted_obstacle->distance < head->distance)
+    {
+        sorted_obstacle->next=head;
+        head = sorted_obstacle;
+
+    }
+    else
+    {
+        current=head;
+
+
+
+            while(current->next!=NULL && current->next->distance < sorted_obstacle->distance)
+            {
+
+                current=current->next;
+            }
+            sorted_obstacle->next=current->next;
+            current->next=sorted_obstacle;
+    }
+}
+
+insert_func(string name,double x,double y,obstacle*& head)//function to insert the elements in the list
+{
+    obstacle *new_insert=new obstacle;
+    new_insert ->name=name;
+    new_insert ->x = x;
+    new_insert->y=y;
+    new_insert->distance = sqrt(pow(x,2)+pow(y,2));
+    sorting(head,new_insert);
+}
+
+void display_List(obstacle *&head)//function to display the list elements , Task 5
+{
+    obstacle *curr=head;
+    while(curr)
+    {
+
+        cout <<"obstacle "<<curr->name<<fixed << setprecision(2)<<": (  "<<setw(6)<<right<<curr->x<<" , "<<setw(6)<<right<<curr->y<<" ), distance:   "<<setw(6)<<right<<curr->distance<<"m, nearest to this: "<<nearest(head,curr)->name<<endl;
+        curr=curr->next;
+    }
+}
+
+void Delete_list(obstacle *head) //function to delete all elements , Task 6
+{
+    obstacle *temp=head,*next;
+    while(temp!=NULL)
+    {
+    next=temp->next;
+    delete temp;
+    temp=next;
+    }
+    delete head;
+    head=NULL;
+}
+
+
+int main() //Main , Task 7
+{
+    obstacle *head = nullptr;
+    double x,y;
+    string name;
+    while (name!="end")
+    {
+        cout<<"string describing obstacle (""end"" for end of input): ";
+        cin.sync();
+        getline(cin,name);
+        if(name=="end")
+        {
+            break;
+        }
+        else
+        {
+            cout<<"x and y coordinate: ";
+            cin>>x>>y;
+            insert_func(name,x,y,head);
+        }
+    }
+    obstacle *current_obstacle=head;//this obstacle is used as a reference of the head
+    display_List(head);
+
+    cout<<"delete: ";
+    while(current_obstacle!=NULL)
+    {
+        cout<<current_obstacle->name<<" ";
+        current_obstacle=current_obstacle->next;
+    }
+
+    Delete_list(head);
+    return 0;
+}
